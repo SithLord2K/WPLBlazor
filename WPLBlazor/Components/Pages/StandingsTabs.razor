@@ -4,10 +4,10 @@
 <PageTitle>Standings</PageTitle>
 
 <Anchor id="top" />
-<Card Padding="Padding.Is2">
+@* <Card Padding="Padding.Is2">
     <CardBody>
         <CardTitle Size="3">Standings</CardTitle>
-        <Divider />
+        <Divider /> *@
         <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged" RenderMode="TabsRenderMode.LazyLoad">
             <Items>
                 <Tab Name="team_standings">Team Standings</Tab>
@@ -22,8 +22,8 @@
                 </TabPanel>
             </Content>
         </Tabs>
-    </CardBody>
-</Card>
+@*     </CardBody>
+</Card> *@
 @code {
     string selectedTab = "team_standings";
     private Task OnSelectedTabChanged(string name)

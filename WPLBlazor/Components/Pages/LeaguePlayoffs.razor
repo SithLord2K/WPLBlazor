@@ -7,7 +7,7 @@
 
 <PageTitle>Playoffs Schedule</PageTitle>
 
-<Card Padding="Padding.Is2">
+@* <Card Padding="Padding.Is2">
     <CardBody>
         <CardTitle Size="3">Playoff Schedule</CardTitle>
         <Divider />
@@ -52,7 +52,14 @@
             }
         </CardText>
     </CardBody>
-</Card>
+</Card> *@
+<SfSchedule TValue="ScheduleData" Height="100%" Width="100%" CurrentView="View.Month" Readonly SelectedDate="@selectedDate">
+    <ScheduleEventSettings DataSource="@scheduleData"></ScheduleEventSettings>
+    <ScheduleViews>
+        <ScheduleView Option="View.Month" ShowWeekend="false"></ScheduleView>
+    </ScheduleViews>
+</SfSchedule>
+
 <ScrollToTop />
 
 @code {
@@ -66,7 +73,10 @@
     private List<TeamDetail> teams = [];
     private List<TeamStats> teamStats = [];
     private List<WeekFullInfo> weeks = [];
+    private List<ScheduleData> scheduleData = [];
     private WeekFullInfo? homeWeek = new();
+    public DateTime selectedDate = new();
+    int id;
 
     public LeaguePlayoffs(RosterHelper rosterHelper, TeamHelper teamHelper, WeekHelper weekHelper)
     {
@@ -82,7 +92,29 @@
         schedules = await RosterHelper.GetSchedules();
         teamStats = await teamHelper.GetAllTeamStats();
         weeks = await weekHelper.GetFullWeek();
+        selectedDate = DateTime.Now.Date;
+        await LoadSchedule();
         await loadingIndicator.Hide();
 
+    }
+
+    async Task LoadSchedule()
+    {
+        foreach (var day in schedules.DistinctBy(x => x.Date).Where(x => x.Playoffs == true))
+        {
+            foreach (var d in schedules.Where(x => x.Date == day.Date))
+            {
+                scheduleData.Add(new ScheduleData
+                    {
+                        Id = id++,
+                        CalendarId = d.Week_Id,
+                        Subject = $"{teams.Where(x => x.Id == d.Home_Team).First().TeamName} vs {teams.Where(x => x.Id == d.Away_Team).First().TeamName}",
+                        StartTime = d.Date.ToDateTime(TimeOnly.Parse("7:30 PM")),
+                        EndTime = d.Date.ToDateTime(TimeOnly.Parse("11:59 PM")),
+                        IsAllDay = false,
+                        Location = $"Table: {d.Table_Number}"
+                    });
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ using Blazorise.LoadingIndicator;
 using WPLBlazor.Data;
 using WPLBlazor.Data.Services;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Blazor;
 
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
@@ -63,6 +64,10 @@ builder.Services
     .AddBootstrap5Providers()
     .AddFontAwesomeIcons()
     .AddLoadingIndicator();
+
+//Syncfusion
+builder.Services.AddSyncfusionBlazor();
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetSection("SFLicense").Value);
 
 var app = builder.Build();
 

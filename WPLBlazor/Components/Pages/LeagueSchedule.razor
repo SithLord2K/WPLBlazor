@@ -6,7 +6,7 @@
 
 <PageTitle>Schedule</PageTitle>
 
-<Card Padding="Padding.Is2">
+@* <Card Padding="Padding.Is2">
     <CardBody>
         <CardTitle Size="3">Season Schedule</CardTitle>
         <Divider />
@@ -76,7 +76,15 @@
             }
         </CardText>
     </CardBody>
-</Card>
+</Card> *@
+<center>
+<SfSchedule TValue="ScheduleData" Height="100%" Width="100%" CurrentView="View.Month" Readonly SelectedDate="@selectedDate">
+    <ScheduleEventSettings DataSource="@scheduleData"></ScheduleEventSettings>
+    <ScheduleViews>
+        <ScheduleView Option="View.Month" ShowWeekend="false"></ScheduleView>
+    </ScheduleViews>
+    </SfSchedule>
+</center>
 
 <ScrollToTop />
 
@@ -91,6 +99,8 @@
     private readonly TeamHelper teamHelper;
     private readonly WeekHelper weekHelper;
     private readonly DataFactory aPIService;
+
+    private List<ScheduleData> scheduleData = new();
     private List<Schedules> schedules = [];
     private List<TeamDetail> teams = [];
     private List<TeamStats> teamStats = [];
@@ -98,7 +108,8 @@
     private WeekFullInfo? homeWeek = new();
     private DayOfWeek[] disabledDays = [];
     private DatePicker<DateOnly> datePicker { get; set; }
-    public DateOnly selectedDate = new();
+    public DateTime selectedDate = new();
+    int id;
 
     public LeagueSchedule(RosterHelper rosterHelper, TeamHelper teamHelper, WeekHelper weekHelper, DataFactory aPIService)
     {
@@ -124,8 +135,30 @@
         schedules = await rosterHelper.GetSchedules();
         teamStats = await teamHelper.GetAllTeamStats();
         weeks = await weekHelper.GetFullWeek();
+        selectedDate = DateTime.Now.Date;
+        await LoadSchedule();
         await loadingIndicator.Hide();
 
+    }
+
+    async Task LoadSchedule()
+    {
+        foreach (var day in schedules.DistinctBy(x => x.Date).Where(x => x.Playoffs == false))
+        {
+            foreach (var d in schedules.Where(x => x.Date == day.Date))
+            {
+                scheduleData.Add(new ScheduleData
+                    {
+                        Id = id++,
+                        CalendarId = d.Week_Id,
+                        Subject = $"{teams.Where(x => x.Id == d.Home_Team).First().TeamName} vs {teams.Where(x => x.Id == d.Away_Team).First().TeamName}",
+                        StartTime = d.Date.ToDateTime(TimeOnly.Parse("7:30 PM")),
+                        EndTime = d.Date.ToDateTime(TimeOnly.Parse("11:59 PM")),
+                        IsAllDay = false,
+                        Location = $"Table: {d.Table_Number}"
+                    });
+            }
+        }
     }
 
     async Task<bool> HomeWinChecked(int WeekId, int HomeId)
