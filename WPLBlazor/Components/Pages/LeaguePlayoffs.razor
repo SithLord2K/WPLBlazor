@@ -6,7 +6,7 @@
 
 <PageTitle>Playoffs Schedule</PageTitle>
 
-<SfSchedule TValue="ScheduleData"  Height="Auto" Width="Auto" CurrentView="View.Month" ShowWeekend="false" Readonly SelectedDate="@selectedDate">
+<SfSchedule TValue="ScheduleData"  Height="Auto" Width="Auto" CurrentView="View.Month" ShowWeekend="false" Readonly @bind-SelectedDate="@selectedDate">
     <ScheduleEventSettings DataSource="@scheduleData"></ScheduleEventSettings>
     <ScheduleViews>
         <ScheduleView Option="View.Month" ShowWeekend="false"></ScheduleView>
