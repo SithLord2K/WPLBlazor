@@ -7,50 +7,43 @@
 <Anchor id="top" />
 @if (teams is not null)
 {
-  @*   <Card Padding="Padding.Is2">
-        <CardBody>
-            <CardTitle Size="3">Rosters</CardTitle>
-            <Divider />
-            <CardText> *@
-                <Table Bordered Striped Responsive>
-                    <TableHeader Border="Border.Is1" Width="Width.Auto">
-                    </TableHeader>
-                    @foreach (var team in teams)
+    <Table Bordered Striped Responsive>
+        <TableHeader Border="Border.Is1" Width="Width.Auto">
+        </TableHeader>
+        @foreach (var team in teams)
+        {
+            @if (team.TeamName == "Bye")
+            {
+                continue;
+            }
+            <TableBody Width="Width.Auto">
+                <TableRowGroup Title="@team.TeamName">
+                    <TableHeaderCell TextAlignment="TextAlignment.Center">Name</TableHeaderCell>
+                    <TableHeaderCell TextAlignment="TextAlignment.Center">Games Played</TableHeaderCell>
+                    <TableHeaderCell TextAlignment="TextAlignment.Center">Captain?</TableHeaderCell>
+                    @foreach (var roster in rosters.Where(x => x.TeamId == team.Id))
                     {
-                        @if (team.TeamName == "Bye")
-                        {
-                            continue;
-                        }
-                        <TableBody Width="Width.Auto">
-                            <TableRowGroup Title="@team.TeamName">
-                                <TableHeaderCell TextAlignment="TextAlignment.Center">Name</TableHeaderCell>
-                                <TableHeaderCell TextAlignment="TextAlignment.Center">Games Played</TableHeaderCell>
-                                <TableHeaderCell TextAlignment="TextAlignment.Center">Captain?</TableHeaderCell>
-                                @foreach (var roster in rosters.Where(x => x.TeamId == team.Id))
-                                {
-                                    <TableRow>
-                                        <TableRowCell TextAlignment="TextAlignment.Center">@roster.Player_Name</TableRowCell>
-                                        @if (players is not null)
-                                        {
-                                            <TableRowCell TextAlignment="TextAlignment.Center">@players.Where(x => x.Id == roster.Player_Id).First().GamesPlayed</TableRowCell>
-                                        }
-                                        @if (roster.Player_Id == roster.Captain_Player_Id)
-                                        {
-                                            <TableRowCell TextAlignment="TextAlignment.Center"><Icon Name="IconName.Check" /></TableRowCell>
-                                        }
-                                        else
-                                        {
-                                            <TableRowCell></TableRowCell>
-                                        }
-                                    </TableRow>
-                                }
-                            </TableRowGroup>
-                        </TableBody>
+                        <TableRow>
+                            <TableRowCell TextAlignment="TextAlignment.Center">@roster.Player_Name</TableRowCell>
+                            @if (players is not null)
+                            {
+                                <TableRowCell TextAlignment="TextAlignment.Center">@players.Where(x => x.Id == roster.Player_Id).First().GamesPlayed</TableRowCell>
+                            }
+                            @if (roster.Player_Id == roster.Captain_Player_Id)
+                            {
+                                <TableRowCell TextAlignment="TextAlignment.Center"><Icon Name="IconName.Check" /></TableRowCell>
+                            }
+                            else
+                            {
+                                <TableRowCell></TableRowCell>
+                            }
+                        </TableRow>
                     }
-                </Table>
-@*             </CardText>
-        </CardBody>
-    </Card> *@
+                </TableRowGroup>
+            </TableBody>
+        }
+    </Table>
+
     <ScrollToTop />
 
 }

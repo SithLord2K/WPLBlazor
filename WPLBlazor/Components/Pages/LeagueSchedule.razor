@@ -1,95 +1,20 @@
-﻿@page "/schedule"
-@attribute [StreamRendering]
+﻿@attribute [StreamRendering]
 @using Schedules = WPLBlazor.Data.Models.Schedule
 @using WPLBlazor.Data.Services
 @inject NavigationManager navigationManager
 
 <PageTitle>Schedule</PageTitle>
 
-@* <Card Padding="Padding.Is2">
-    <CardBody>
-        <CardTitle Size="3">Season Schedule</CardTitle>
-        <Divider />
-        <CardText>
-            Select date to jump to that week:
-            <Addons>
-                <Addon AddonType="AddonType.Body">
-                    <DatePicker @ref="@datePicker"
-                                TValue="DateOnly"
-                                DisabledDays="@disabledDays"
-                                DateChanged="@SelectedDate"
-                                Date="@selectedDate"
-                                ReadOnly="true"
-                                DisplayFormat="MMMM dd, yyyy" />
-                </Addon>
-                <Addon AddonType="AddonType.End">
-                    <Button Color="Blazorise.Color.Light" Clicked="@(()=>datePicker.ToggleAsync())">
-                        <Icon Name="IconName.Calendar" />
-                    </Button>
-                </Addon>
-            </Addons>
-            <br />
-            @foreach (var day in schedules.DistinctBy(x => x.Date).Where(x => x.Playoffs == false))
-            {
-                <anchor id="@day.Date" />
-                <Anchor To="" />
-                <Card>
-                    <CardBody>
-                        <CardTitle Size="4"></CardTitle>
-                        <CardText TextAlignment="TextAlignment.Center">
-                            <h3>@day.Date.ToLongDateString()</h3>
-                            <h4>Week: @day.Week_Id</h4>
-                            <Table Striped
-                                   Bordered
-                                   Responsive>
-                                <TableHeader ThemeContrast="ThemeContrast.Dark">
-                                    <TableRow>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Win</TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Home Team</TableHeaderCell>
-                                        <TableHeaderCell></TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Away Team</TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Win</TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Table Number</TableHeaderCell>
-                                    </TableRow>
-                                </TableHeader>
-                                @foreach (var d in schedules.Where(x => x.Date == day.Date))
-                                {
-                                    <TableBody>
-                                        @if (teams != null)
-                                        {
-                                            <TableRow>
-                                                <TableRowCell TextAlignment="TextAlignment.Center"><Check Checked="@HomeWinChecked(d.Week_Id, d.Home_Team).Result" Disabled /></TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@teams.Where(x => x.Id == d.Home_Team).First().TeamName</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">vs</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@teams.Where(x => x.Id == d.Away_Team).First().TeamName</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center"><Check Checked="@AwayWinChecked(d.Week_Id, d.Away_Team).Result" Disabled /></TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@d.Table_Number</TableRowCell>
-                                            </TableRow>
-                                        }
-                                    </TableBody>
-                                }
-                            </Table>
-                        </CardText>
-                    </CardBody>
-                </Card>
-                <br />
-            }
-        </CardText>
-    </CardBody>
-</Card> *@
 <center>
-<SfSchedule TValue="ScheduleData" Height="100%" Width="100%" CurrentView="View.Month" Readonly SelectedDate="@selectedDate">
+<SfSchedule TValue="ScheduleData" Height="Auto" Width="Auto"  CurrentView="View.Month" ShowWeekend="false" Readonly SelectedDate="@selectedDate">
     <ScheduleEventSettings DataSource="@scheduleData"></ScheduleEventSettings>
     <ScheduleViews>
-        <ScheduleView Option="View.Month" ShowWeekend="false"></ScheduleView>
+        <ScheduleView Option="View.Month" ></ScheduleView>
     </ScheduleViews>
     </SfSchedule>
 </center>
 
 <ScrollToTop />
-
-
-
 
 @code {
     [CascadingParameter]
@@ -108,7 +33,8 @@
     private WeekFullInfo? homeWeek = new();
     private DayOfWeek[] disabledDays = [];
     private DatePicker<DateOnly> datePicker { get; set; }
-    public DateTime selectedDate = new();
+    public DateTime selectedDate { get; set; }
+
     int id;
 
     public LeagueSchedule(RosterHelper rosterHelper, TeamHelper teamHelper, WeekHelper weekHelper, DataFactory aPIService)
@@ -135,7 +61,7 @@
         schedules = await rosterHelper.GetSchedules();
         teamStats = await teamHelper.GetAllTeamStats();
         weeks = await weekHelper.GetFullWeek();
-        selectedDate = DateTime.Now.Date;
+        selectedDate = DateTime.Now;
         await LoadSchedule();
         await loadingIndicator.Hide();
 

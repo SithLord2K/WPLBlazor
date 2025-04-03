@@ -1,5 +1,4 @@
-﻿@page "/playoffs"
-@attribute [StreamRendering]
+﻿@attribute [StreamRendering]
 @using Schedules = WPLBlazor.Data.Models.Schedule
 @using WPLBlazor.Data.Services
 @inject DataFactory aPIService
@@ -7,53 +6,7 @@
 
 <PageTitle>Playoffs Schedule</PageTitle>
 
-@* <Card Padding="Padding.Is2">
-    <CardBody>
-        <CardTitle Size="3">Playoff Schedule</CardTitle>
-        <Divider />
-        <CardText>
-            @foreach (var day in schedules.DistinctBy(x => x.Date).Where(x => x.Playoffs == true))
-            {
-                <Card Padding="Padding.Is2">
-                    <CardBody>
-                        <CardTitle>
-
-                        </CardTitle>
-                        <CardText TextAlignment="TextAlignment.Center">
-                            <h3>@day.Date.ToLongDateString()</h3>
-                            <h4>Week: @day.Week_Id_Playoff</h4>
-                            <Table Striped Bordered Responsive>
-                                <TableHeader ThemeContrast="ThemeContrast.Dark">
-                                    <TableRow>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Home Team</TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center"></TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Away Team</TableHeaderCell>
-                                        <TableHeaderCell TextAlignment="TextAlignment.Center">Table #</TableHeaderCell>
-                                    </TableRow>
-                                </TableHeader>
-                                @foreach (var d in schedules.Where(x => x.Playoffs == true))
-                                {
-                                    <TableBody>
-                                        @if (teams != null)
-                                        {
-                                            <TableRow>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@teams.Where(x => x.Id == d.Home_Team).First().TeamName</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">vs</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@teams.Where(x => x.Id == d.Away_Team).First().TeamName</TableRowCell>
-                                                <TableRowCell TextAlignment="TextAlignment.Center">@d.Table_Number</TableRowCell>
-                                            </TableRow>
-                                        }
-                                    </TableBody>
-                                }
-                            </Table>
-                        </CardText>
-                    </CardBody>
-                </Card>
-            }
-        </CardText>
-    </CardBody>
-</Card> *@
-<SfSchedule TValue="ScheduleData" Height="100%" Width="100%" CurrentView="View.Month" Readonly SelectedDate="@selectedDate">
+<SfSchedule TValue="ScheduleData"  Height="Auto" Width="Auto" CurrentView="View.Month" ShowWeekend="false" Readonly SelectedDate="@selectedDate">
     <ScheduleEventSettings DataSource="@scheduleData"></ScheduleEventSettings>
     <ScheduleViews>
         <ScheduleView Option="View.Month" ShowWeekend="false"></ScheduleView>
@@ -75,7 +28,7 @@
     private List<WeekFullInfo> weeks = [];
     private List<ScheduleData> scheduleData = [];
     private WeekFullInfo? homeWeek = new();
-    public DateTime selectedDate = new();
+    public DateTime selectedDate { get; set; }
     int id;
 
     public LeaguePlayoffs(RosterHelper rosterHelper, TeamHelper teamHelper, WeekHelper weekHelper)
@@ -92,7 +45,7 @@
         schedules = await RosterHelper.GetSchedules();
         teamStats = await teamHelper.GetAllTeamStats();
         weeks = await weekHelper.GetFullWeek();
-        selectedDate = DateTime.Now.Date;
+        selectedDate = DateTime.Now;
         await LoadSchedule();
         await loadingIndicator.Hide();
 
