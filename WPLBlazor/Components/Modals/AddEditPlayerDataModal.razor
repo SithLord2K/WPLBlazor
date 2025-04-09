@@ -92,7 +92,7 @@
 @code {
     private Player player { get; set; } = new();
     [Inject] private IToastService? ToastService { get; set; }
-    
+
     //Lists
     private List<TeamDetail> teams = [];
     private List<Player> players = [];
@@ -110,6 +110,7 @@
 
     //Variables
     private int total;
+    private bool isNewWeek = false;
     private PlayerDatum playerData = new();
 
     public AddEditPlayerDataModal(PlayerHelpers playerHelper, WeekHelper weekHelper, DataFactory apiService)
@@ -154,7 +155,9 @@
         if (players is not null)
         {
             player = players.Where(e => e.Id == value).FirstOrDefault();
+            playerData.WeekNumber = pData.Where(x => x.PlayerId == player.Id).OrderBy(c => c.WeekNumber).Last().WeekNumber + 1;
         }
+        var test = 0;
     }
 
     Task DoesWeekExist()

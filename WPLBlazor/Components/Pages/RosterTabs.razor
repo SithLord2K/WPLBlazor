@@ -1,0 +1,64 @@
+﻿@page "/roster"
+@attribute [StreamRendering]
+@using Roster = WPLBlazor.Data.Models.Roster
+
+<PageTitle>Rosters</PageTitle>
+
+<Anchor id="top" />
+<Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged" RenderMode="TabsRenderMode.LazyLoad">
+    <Items>
+        @foreach (var team in teams)
+        {
+            if (team.TeamName == "Bye")
+            {
+                continue;
+            }
+            <Tab Name="@team.TeamName">@team.TeamName</Tab>
+        }
+    </Items>
+    <Content>
+        @foreach(var team in teams)
+        {
+            @team.TeamName
+        }
+    </Content>
+</Tabs>
+
+@code {
+    [CascadingParameter]
+    LoadingIndicator loadingIndicator { get; set; } = new();
+
+    private List<Players>? players = [];
+    private List<TeamDetail> teams = [];
+    private List<Roster> rosters = [];
+    string selectedTab;
+
+    //Inject Services
+    private readonly RosterHelper rosterHelper;
+    private readonly PlayerHelpers playerHelpers;
+    private readonly DataFactory aPIService;
+    public RosterTabs(DataFactory aPIService, RosterHelper rosterHelper, PlayerHelpers playerHelpers)
+    {
+        this.aPIService = aPIService;
+        this.rosterHelper = rosterHelper;
+        this.playerHelpers = playerHelpers;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await loadingIndicator.Show();
+        players = await playerHelpers.ConsolidatePlayer();
+        teams = await aPIService.GetTeamDetails();
+        rosters = await rosterHelper.GetRoster();
+        selectedTab = teams[0].TeamName;
+        await loadingIndicator.Hide();
+    }
+    
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+
+}
